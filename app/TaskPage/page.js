@@ -159,8 +159,8 @@ function TaskPage() {
             className="overflow-x-auto  "
             style={{ display: "flex", flexDirection: "row" }}
           >
-            {tasks.map((task) => (
-              <div className=" p-2 flex-shrink-0">
+            {tasks.map((index, task) => (
+              <div key={index} className=" p-2 flex-shrink-0">
                 <Task task={task} />
               </div>
             ))}
