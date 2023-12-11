@@ -4,7 +4,7 @@ import { useState } from "react";
 import SubTask from "./SubTask";
 import AlertDialog from "./AlertDialog";
 import { db } from "../_utils/firebase";
-import { deleteDoc, doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
 import { useUserAuth } from "../_utils/auth-context";
 
 function Task({ task }) {
@@ -28,7 +28,6 @@ function Task({ task }) {
         let newTask = {
           ...task,
           subTasks: [...task.subTasks, value],
-          createdTime: serverTimestamp(),
         };
         delete newTask.id;
         await setDoc(doc(db, "users", user.uid, "tasks", id), newTask);

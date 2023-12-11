@@ -152,11 +152,15 @@ function TaskPage() {
             className="overflow-x-auto  "
             style={{ display: "flex", flexDirection: "row" }}
           >
-            {tasks.map((task, index) => (
-              <div key={index} className=" p-2 flex-shrink-0">
-                <Task task={task} />
-              </div>
-            ))}
+            {tasks
+              .sort((a, b) => {
+                return b.createdTime.toMillis() - a.createdTime.toMillis();
+              })
+              .map((task, index) => (
+                <div key={index} className=" p-2 flex-shrink-0">
+                  <Task task={task} />
+                </div>
+              ))}
           </div>
         </aside>
       </div>
