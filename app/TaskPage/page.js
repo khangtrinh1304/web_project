@@ -1,22 +1,52 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import TaskList from "./TaskList";
+import Task from "./Task";
 import AlertDialog from "./AlertDialog";
 import { addTask } from "../_services/taskService";
 import { useUserAuth } from "../_utils/auth-context";
 import { addUser } from "../_services/logInServices";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  query,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "../_utils/firebase";
 
 function TaskPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isDialogOpen, setDialogOpen] = useState(false);
-  const [isErrorDialogOpen, setErrorDialogOpen] = useState(false);
-  const [taskLists, setTaskLists] = useState([]);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [tasks, setTasks] = useState([]);
   const { user, logout } = useUserAuth();
+
+  useEffect(() => {
+    if (user) {
+      const q = query(collection(db, "users", user.uid, "tasks"));
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const tasks = [];
+        querySnapshot.forEach((doc) => {
+          tasks.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+
+        setTasks(tasks);
+      });
+
+      return () => {
+        unsubscribe();
+      };
+    }
+  }, [user]);
 
   if (user == null) {
     return (
@@ -26,15 +56,11 @@ function TaskPage() {
     );
   }
 
-  const task = {
-    title: title,
-    description: description,
-  };
-
   const handleTitleChange = (event) => {
     const val = event.target?.value;
     setTitle(val);
   };
+
   const handleDescriptionChange = (event) => {
     const val = event.target?.value;
     setDescription(val);
@@ -45,35 +71,21 @@ function TaskPage() {
     router.replace("LandingPage");
   };
 
-  const newItem = {
-    fullName: title,
-    userName: description,
-    password: description,
-  };
-  const newTask = {
-    title: title,
-    description: description,
-  };
-
-  const handleAddNewTask = () => {
+  const handleAddNewTask = async () => {
     if (title == "") {
-      setErrorDialogOpen(true);
+      setErrorMessage("Title can't be empty");
     } else {
-      setTaskLists((taskLists) => [
-        ...taskLists,
-        { title: title, description: description },
-      ]);
-
-      setTitle("");
-      setDescription("");
-      setDialogOpen(true);
-
-      if (user) {
-        addUser(newItem, user.uid);
-        addTask(newTask, user.uid);
-        console.log("addTask", user.uid);
-      } else {
-        console.log("fail");
+      try {
+        await addDoc(collection(db, "users", user.uid, "tasks"), {
+          title: title,
+          description: description,
+          subTasks: [],
+        });
+        setTitle("");
+        setDescription("");
+        setDialogOpen(true);
+      } catch (error) {
+        setErrorMessage(error.message);
       }
     }
   };
@@ -81,9 +93,6 @@ function TaskPage() {
     setDialogOpen(false);
   };
 
-  const handleCloseErrorDialog = () => {
-    setErrorDialogOpen(false);
-  };
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <AlertDialog
@@ -92,9 +101,9 @@ function TaskPage() {
         content={"Task is added successfully!"}
       />
       <AlertDialog
-        isOpen={isErrorDialogOpen}
-        onClose={handleCloseErrorDialog}
-        content={"Empty task title, please try again!"}
+        isOpen={errorMessage != null}
+        onClose={() => setErrorMessage(null)}
+        content={errorMessage}
       />
       <button
         className="absolute left-4 top-4 bg-[#DC8686] text-white p-2 rounded-md hover:bg-[#bf7676]"
@@ -150,20 +159,11 @@ function TaskPage() {
             className="overflow-x-auto  "
             style={{ display: "flex", flexDirection: "row" }}
           >
-            {taskLists.map((taskList) => (
+            {tasks.map((task) => (
               <div className=" p-2 flex-shrink-0">
-                <TaskList
-                  title={taskList.title}
-                  description={taskList.description}
-                />
+                <Task task={task} />
               </div>
             ))}
-            <div className=" p-2 flex-shrink-0">
-              <TaskList title={"Task Title"} description={"Task description"} />
-            </div>{" "}
-            <div className=" p-2 flex-shrink-0">
-              <TaskList title={"Task Title"} description={"Task description"} />
-            </div>{" "}
           </div>
         </aside>
       </div>
