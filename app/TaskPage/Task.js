@@ -52,7 +52,7 @@ function Task({ task }) {
       <h2 className="text-xl font-bold mb-2 ">{task.title}</h2>
       <p className=" text-sm italic mb-4">{task.description}</p>
       <div>
-        {task.subTasks.map((index, subTask) => (
+        {task.subTasks.map((subTask, index) => (
           <SubTask key={index} content={subTask} />
         ))}
         <AlertDialog

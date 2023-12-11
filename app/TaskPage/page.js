@@ -68,7 +68,7 @@ function TaskPage() {
 
   const handleLogout = async (event) => {
     await logout();
-    router.replace("LandingPage");
+    router.replace(`/LandingPage`);
   };
 
   const handleAddNewTask = async () => {
@@ -159,7 +159,7 @@ function TaskPage() {
             className="overflow-x-auto  "
             style={{ display: "flex", flexDirection: "row" }}
           >
-            {tasks.map((index, task) => (
+            {tasks.map((task, index) => (
               <div key={index} className=" p-2 flex-shrink-0">
                 <Task task={task} />
               </div>

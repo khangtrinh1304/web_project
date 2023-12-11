@@ -16,8 +16,8 @@ export default function LoginPage() {
   async function handleSignIn() {
     try {
       await gitHubSignIn();
+      router.replace(`/TaskPage`)
       console.log(user);
-      router.replace("TaskPage");
     } catch (error) {
       console.log(error);
     }
@@ -36,14 +36,12 @@ export default function LoginPage() {
       className="flex justify-center items-center min-h-screen"
       style={{ backgroundColor: "#FFFFFF" }}
     >
-      <Link href="./LoginPage">
-        <button
-          onClick={() => router.back()}
-          className="absolute left-4 top-4 bg-[#DC8686] text-white p-2 rounded-md hover:bg-[#bf7676]"
-        >
-          ← Back To Main Page
-        </button>
-      </Link>
+      <button
+        onClick={() => router.back()}
+        className="absolute left-4 top-4 bg-[#DC8686] text-white p-2 rounded-md hover:bg-[#bf7676]"
+      >
+        ← Back To Main Page
+      </button>
 
       <div className="w-full max-w-sm">
         <h1
