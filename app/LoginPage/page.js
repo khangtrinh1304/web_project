@@ -53,7 +53,7 @@ export default function LoginPage() {
           SIMPLETASK
         </h1>
         <div className="space-y-6">
-          <div>
+          {/* <div>
             <label
               htmlFor="username"
               className="text-sm font-bold text-gray-600 block"
@@ -83,7 +83,7 @@ export default function LoginPage() {
           </div>
           <button className="w-full py-2 px-4 bg-[#DC8686] text-white rounded-md font-bold hover:bg-[#bf7676] transition duration-300">
             Log In
-          </button>
+          </button> */}
           {/* <button
           onClick={handleSignOut}
             className="w-full py-2 px-4 bg-blue-600 text-white rounded-md font-bold hover:bg-blue-700 transition duration-300 flex items-center justify-center"
