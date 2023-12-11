@@ -33,12 +33,12 @@ export default function LandingPage() {
         >
           Log In
         </button>
-        <button
+        {/* <button
           onClick={() => router.push(`/SignUpPage`)}
           className="w-full py-2 px-4 bg-[#DC8686] text-white rounded-md text-lg font-bold hover:bg-[#bf7676] transition duration-300"
         >
           Sign Up
-        </button>
+        </button> */}
       </div>
     </main>
   );

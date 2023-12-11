@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   onSnapshot,
@@ -51,7 +52,7 @@ function TaskPage() {
   if (user == null) {
     return (
       <>
-        <p>Unauthorized</p>
+        <p>Loading...</p>
       </>
     );
   }
@@ -89,6 +90,15 @@ function TaskPage() {
       }
     }
   };
+
+  const deleteTask = async (taskId) => {
+    try {
+      await deleteDoc(doc(db, "users", user.uid, "tasks", taskId));
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
+
   const handleCloseDialog = () => {
     setDialogOpen(false);
   };
