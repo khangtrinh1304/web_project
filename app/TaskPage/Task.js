@@ -3,16 +3,8 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import SubTask from "./SubTask";
 import AlertDialog from "./AlertDialog";
-import { addUser } from "../_services/logInServices";
 import { db } from "../_utils/firebase";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  setDoc,
-} from "firebase/firestore";
+import { deleteDoc, doc, serverTimestamp, setDoc } from "firebase/firestore";
 import { useUserAuth } from "../_utils/auth-context";
 
 function Task({ task }) {
@@ -33,7 +25,11 @@ function Task({ task }) {
         setErrorMessage("Sub-task must not be empty");
       } else {
         const id = task.id;
-        let newTask = { ...task, subTasks: [...task.subTasks, value] };
+        let newTask = {
+          ...task,
+          subTasks: [...task.subTasks, value],
+          createdTime: serverTimestamp(),
+        };
         delete newTask.id;
         await setDoc(doc(db, "users", user.uid, "tasks", id), newTask);
         setValue("");
@@ -44,13 +40,36 @@ function Task({ task }) {
     }
   };
 
+  const deleteTask = async () => {
+    try {
+      await deleteDoc(doc(db, "users", user.uid, "tasks", task.id));
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
+  };
+
+  const date = new Date(task.createdTime.toMillis());
+  const formattedDate =
+    date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }) +
+    " " +
+    date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
   return (
     <div
       className="bg-gray-100 text-gray-800 p-4 rounded-md shadow-md"
       style={{ maxWidth: "280px" }}
     >
       <h2 className="text-xl font-bold mb-2 ">{task.title}</h2>
-      <p className=" text-sm italic mb-4">{task.description}</p>
+      <p className=" text-sm mb-2">{task.description}</p>
+      <p className=" text-sm italic mb-2">{formattedDate}</p>
       <div>
         {task.subTasks.map((subTask, index) => (
           <SubTask key={index} content={subTask} />
@@ -76,12 +95,18 @@ function Task({ task }) {
         value={value}
         style={{ color: "Gray" }}
       />
-
       <button
         onClick={handAddSubTask}
-        className="mt-2 py-2 px-4 bg-[#DC8686] text-white rounded-md font-bold hover:bg-[#bf7676]"
+        className="mt-2 py-2 px-4 bg-[#DC8686] text-white rounded-md font-bold hover:bg-[#bf7676] w-full"
       >
         Add to the list
+      </button>
+
+      <button
+        onClick={() => deleteTask()}
+        className="mt-2 py-2 px-4 bg-[#a99e9e] text-white rounded-md font-bold hover:bg-[#bf7676] w-full"
+      >
+        Remove
       </button>
     </div>
   );

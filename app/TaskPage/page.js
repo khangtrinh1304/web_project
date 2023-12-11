@@ -3,20 +3,9 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import Task from "./Task";
 import AlertDialog from "./AlertDialog";
-import { addTask } from "../_services/taskService";
 import { useUserAuth } from "../_utils/auth-context";
-import { addUser } from "../_services/logInServices";
 import { useRouter } from "next/navigation";
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  onSnapshot,
-  query,
-  setDoc,
-} from "firebase/firestore";
+import { addDoc, collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "../_utils/firebase";
 
 function TaskPage() {
@@ -34,6 +23,7 @@ function TaskPage() {
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const tasks = [];
         querySnapshot.forEach((doc) => {
+          console.log(doc.data());
           tasks.push({
             id: doc.id,
             ...doc.data(),
@@ -81,6 +71,7 @@ function TaskPage() {
           title: title,
           description: description,
           subTasks: [],
+          createdTime: new Date(),
         });
         setTitle("");
         setDescription("");
@@ -88,14 +79,6 @@ function TaskPage() {
       } catch (error) {
         setErrorMessage(error.message);
       }
-    }
-  };
-
-  const deleteTask = async (taskId) => {
-    try {
-      await deleteDoc(doc(db, "users", user.uid, "tasks", taskId));
-    } catch (error) {
-      setErrorMessage(error.message);
     }
   };
 
